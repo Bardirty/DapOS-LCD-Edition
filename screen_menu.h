@@ -2,6 +2,6 @@
 #include <LiquidCrystal_I2C.h>
 #include "screen_mp3.h"
 
-enum DanilScreen { SCREEN_BOOT, SCREEN_MENU, SCREEN_MP3 };
+enum DapScreen { SCREEN_BOOT, SCREEN_MENU, SCREEN_MP3 };
 
-void updateMenu(LiquidCrystal_I2C &lcd, DanilScreen &currentScreen);
+void updateMenu(LiquidCrystal_I2C &lcd, DapScreen &currentScreen);

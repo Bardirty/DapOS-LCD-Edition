@@ -5,7 +5,7 @@
 #include "screen_menu.h"
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-DanilScreen currentScreen = SCREEN_BOOT;
+DapScreen currentScreen = SCREEN_BOOT;
 
 void setup() {
   lcd.begin();

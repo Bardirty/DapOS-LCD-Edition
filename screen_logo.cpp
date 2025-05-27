@@ -1,7 +1,6 @@
 #include "screen_logo.h"
 #include <Arduino.h>
 
-// Пользовательские символы для белки (в профиль, разбита на 4 части)
 byte squirrel0[8] = {
   B00000,
   B01111,
@@ -72,20 +71,26 @@ void showSquirrelLogo(LiquidCrystal_I2C &lcd) {
   lcd.createChar(2, squirrel2);
   lcd.createChar(3, squirrel3);
 
-  lcd.setCursor(6, 0);
-  lcd.write(byte(0));
-  delay(150);
-  lcd.setCursor(7, 0);
-  lcd.write(byte(1));
-  delay(150);
-  lcd.setCursor(6, 1);
-  lcd.write(byte(2));
-  delay(150);
-  lcd.setCursor(7, 1);
-  lcd.write(byte(3));
+  drawSquirell(6, 150, lcd);
   delay(3000);
   lcd.clear();
-  lcd.setCursor(4, 0);
-  lcd.print("Danil OS");
+  drawSquirell(4, 0, lcd);
+  lcd.setCursor(7, 1);
+  lcd.print("DapOS");
   delay(3000);
+}
+
+
+void drawSquirell(int offset, int appearingDelay, LiquidCrystal_I2C &lcd) {
+  lcd.setCursor(offset, 0);
+  lcd.write(byte(0));
+  delay(appearingDelay);
+  lcd.setCursor(offset + 1, 0);
+  lcd.write(byte(1));
+  delay(appearingDelay);
+  lcd.setCursor(offset, 1);
+  lcd.write(byte(2));
+  delay(appearingDelay);
+  lcd.setCursor(offset + 1, 1);
+  lcd.write(byte(3));
 }
