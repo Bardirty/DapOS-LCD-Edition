@@ -17,11 +17,21 @@ void setup() {
   pinMode(5, INPUT_PULLUP); // back
   pinMode(6, INPUT_PULLUP); // fn
 
+  pinMode(8, INPUT_PULLUP); // детекция наушников
+  pinMode(9, OUTPUT);
+
   showSquirrelLogo(lcd);
   currentScreen = SCREEN_MENU;
 }
 
 void loop() {
+  bool headphonesPlugged = !digitalRead(8); // если LOW — наушники вставлены
+
+  if (headphonesPlugged) {
+    digitalWrite(9, LOW);  // выключить динамик (транзистор закрыт)
+  } else {
+    digitalWrite(9, HIGH); // включить динамик (транзистор открыт)
+  }
   if (!digitalRead(5)) {
     currentScreen = SCREEN_MENU;
     delay(250);
