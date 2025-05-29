@@ -25,12 +25,10 @@ void setup() {
 }
 
 void loop() {
-  bool headphonesPlugged = !digitalRead(8); // если LOW — наушники вставлены
-
-  if (headphonesPlugged) {
-    digitalWrite(9, LOW);  // выключить динамик (транзистор закрыт)
+  if (digitalRead(8) == LOW) {
+    digitalWrite(9, LOW); // отключаем динамик
   } else {
-    digitalWrite(9, HIGH); // включить динамик (транзистор открыт)
+    digitalWrite(9, HIGH); // включаем или тестовый сигнал
   }
   if (!digitalRead(5)) {
     currentScreen = SCREEN_MENU;

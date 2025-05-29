@@ -1,10 +1,15 @@
 #include "screen_mp3.h"
+#include "screen_volume.h"
 #include <DFPlayerMini_Fast.h>
 #include <SoftwareSerial.h>
 
 static int track = 1;
 static int volume = 10;
 static bool playing = true;
+
+enum Mode { MODE_TRACK, MODE_VOLUME };
+static Mode currentMode = MODE_TRACK;
+
 const int maxTrack = 10;
 const int maxVolume = 30;
 
@@ -17,6 +22,7 @@ void updateScreenMP3(LiquidCrystal_I2C &lcd) {
   static int lastTrack = -1;
   static int lastVolume = -1;
   static bool lastPlaying = !playing;
+  static Mode lastMode = MODE_TRACK;
 
   unsigned long now = millis();
 
@@ -27,63 +33,64 @@ void updateScreenMP3(LiquidCrystal_I2C &lcd) {
       mp3.play(track);
     }
     lcd.clear();
+    initializeVolumeChars(lcd);  // ← Инициализация блоков
     initialized = true;
   }
 
-  bool fn = !digitalRead(6);
-
-  if (digitalRead(7) == HIGH && playing) {
-    track = (track >= maxTrack) ? 1 : track + 1;
-    mp3.play(track);
+  // Переключение режима FN
+  if (now - lastPress > 200 && !digitalRead(6)) {
+    currentMode = (currentMode == MODE_TRACK) ? MODE_VOLUME : MODE_TRACK;
+    lcd.clear();
+    lastPress = now;
     delay(200);
   }
 
+  // Управление кнопками
   if (now - lastPress > 200) {
-    if (!digitalRead(2) && fn && volume > 0) {
-      volume--;
-      mp3.volume(volume);
+    if (!digitalRead(2)) {
+      if (currentMode == MODE_VOLUME && volume > 0) {
+        volume--;
+        mp3.volume(volume);
+      } else if (currentMode == MODE_TRACK) {
+        track = (track <= 1) ? maxTrack : track - 1;
+        mp3.play(track);
+      }
       lastPress = now;
-      delay(200);
-    } else if (!digitalRead(3) && fn && volume < maxVolume) {
-      volume++;
-      mp3.volume(volume);
-      lastPress = now;
-      delay(200);
-    } else if (!digitalRead(2)) {
-      track = (track <= 1) ? maxTrack : track - 1;
-      mp3.play(track);
-      lastPress = now;
-      delay(200);
     } else if (!digitalRead(3)) {
-      track = (track >= maxTrack) ? 1 : track + 1;
-      mp3.play(track);
+      if (currentMode == MODE_VOLUME && volume < maxVolume) {
+        volume++;
+        mp3.volume(volume);
+      } else if (currentMode == MODE_TRACK) {
+        track = (track >= maxTrack) ? 1 : track + 1;
+        mp3.play(track);
+      }
       lastPress = now;
-      delay(200);
     } else if (!digitalRead(4)) {
       playing = !playing;
       playing ? mp3.play(track) : mp3.pause();
       lastPress = now;
-      delay(200);
     }
   }
 
-  if (track != lastTrack || playing != lastPlaying) {
+  // Вывод
+  if (currentMode == MODE_VOLUME) {
+    showVolumePanel(lcd, volume, maxVolume);
+  } else if (track != lastTrack || playing != lastPlaying || currentMode != lastMode) {
     lcd.setCursor(0, 0);
     lcd.print(playing ? "PLAY " : "PAUSE");
     lcd.print("trk:");
     if (track < 10) lcd.print(" ");
     lcd.print(track);
-    lcd.print("  ");
+    lcd.print("   ");
+
+    lcd.setCursor(0, 1);
+    lcd.print("FN = Volume Mode");
+
     lastTrack = track;
     lastPlaying = playing;
+    lastMode = currentMode;
   }
 
-  if (volume != lastVolume) {
-    lcd.setCursor(0, 1);
-    lcd.print("vol:");
-    if (volume < 10) lcd.print(" ");
-    lcd.print(volume);
-    lcd.print("     ");
-    lastVolume = volume;
-  }
+  if (currentMode == MODE_TRACK)
+    lastVolume = -1;  // Сброс, чтобы показать панель при возврате
 }
