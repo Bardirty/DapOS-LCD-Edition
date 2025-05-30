@@ -21,13 +21,22 @@ DFRobotDFPlayerMini mp3;
 void initializeMP3Player(LiquidCrystal_I2C &lcd) {
   pinMode(PIN_BUSY, INPUT);
   mp3Serial.begin(9600);
-  if (mp3.begin(mp3Serial)) {
-    mp3.EQ(DFPLAYER_EQ_NORMAL);
-    mp3.volume(volume);
-    mp3.play(track);
-    playing = true;
-    paused = false;
+
+  lcd.clear();
+  lcd.print("Init DFPlayer...");
+  
+  if (!mp3.begin(mp3Serial)) {
+    lcd.clear();
+    lcd.print("DFPlayer error");
+    delay(1500);
+    return;
   }
+
+  mp3.EQ(DFPLAYER_EQ_NORMAL);
+  mp3.volume(volume);
+  mp3.play(track);
+  playing = true;
+  paused = false;
 
   byte playChar[8] = {
     B00000, B00100, B00110, B00111,
@@ -128,7 +137,6 @@ void renderTrackScreen(LiquidCrystal_I2C &lcd, unsigned long now) {
 void updateScreenMP3(LiquidCrystal_I2C &lcd) {
   static bool initialized = false;
   static unsigned long lastPress = 0;
-  static unsigned long lastModeChange = 0;
 
   unsigned long now = millis();
 
@@ -141,8 +149,8 @@ void updateScreenMP3(LiquidCrystal_I2C &lcd) {
     currentMode = (currentMode == MODE_TRACK) ? MODE_VOLUME : MODE_TRACK;
     lcd.clear();
     lastPress = now;
-    delay(200);
   }
+
   checkAutoNextTrack();
   handleButtons(now, lastPress);
 

@@ -8,7 +8,7 @@ void updateMenu(LiquidCrystal_I2C &lcd, DapScreen &currentScreen) {
   if (firstDraw) {
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print("DapOS LCD v1.4");
+    lcd.print(" DapOS LCD v1.4 ");
     lcd.setCursor(0, 1);
     lcd.print("  <Start> - D4  ");
     firstDraw = false;
