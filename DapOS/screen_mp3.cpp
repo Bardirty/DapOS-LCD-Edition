@@ -39,12 +39,24 @@ void initializeMP3Player(LiquidCrystal_I2C &lcd) {
   paused = false;
 
   byte playChar[8] = {
-    B00000, B00100, B00110, B00111,
-    B00111, B00110, B00100, B00000
+    B00000,
+    B01000,
+    B01100, 
+    B01110,
+    B01110, 
+    B01100, 
+    B01000, 
+    B00000
   };
   byte pauseChar[8] = {
-    B00000, B01010, B01010, B01010,
-    B01010, B01010, B01010, B00000
+    B00000, 
+    B01010, 
+    B01010, 
+    B01010,
+    B01010, 
+    B01010, 
+    B01010, 
+    B00000
   };
   lcd.createChar(6, playChar);
   lcd.createChar(7, pauseChar);
